@@ -217,12 +217,11 @@ def test_prebuilt_and_jit_builds_compile_and_link_an_op_the_same_way():
     with patch.dict(os.environ, {"TORCH_CUDA_ARCH_LIST": "9.0"}, clear=False):
         with patch.object(CUDAOpBuilder, "is_rocm_pytorch", return_value=False):
             with patch.object(builder_module, "assert_no_cuda_mismatch", return_value=True):
-                with patch.object(builder_module, "installed_cuda_version", return_value=(12, 8)):
-                    with patch("torch.utils.cpp_extension.verify_ninja_availability", return_value=None):
-                        with patch("torch.utils.cpp_extension.load", load):
-                            builder.jit_load(verbose=False)
-                    with patch("torch.utils.cpp_extension.CUDAExtension") as cuda_extension:
-                        builder.builder()
+                with patch("torch.utils.cpp_extension.verify_ninja_availability", return_value=None):
+                    with patch("torch.utils.cpp_extension.load", load):
+                        builder.jit_load(verbose=False)
+                with patch("torch.utils.cpp_extension.CUDAExtension") as cuda_extension:
+                    builder.builder()
 
     jit_kwargs = load.call_args.kwargs
     prebuilt_kwargs = cuda_extension.call_args.kwargs
